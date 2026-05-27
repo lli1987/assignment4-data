@@ -20,16 +20,26 @@ from furu import Furu
 BASE_URL = "https://data.commoncrawl.org/"
 
 
-
 class _EnglishWetFile(Furu[Path]):
     chunk_urls: tuple[str, ...]
 
+    def _is_english_func(self, text: str) -> bool:
+        labels, probs = self.model.predict(text, k=1)
+        if labels[0] == "__label__en" and probs[0] >= 0.7:
+            return True
+        return False
+
     def _create(self) -> Path:
+        self.model = fasttext.load_model("lid.176.bin")
+        print(self.model)
+        assert self.model is not None, "cannot load lid.176"
         output_path = self.data_dir / "data.warc.wet.gz"
 
         self.logger.info("Loading English language identifier")
-        is_english: Callable[[str], bool] = "TODO"
-        assert is_english != "TODO", "you need to implement is_english. we use probability >= 0.7 with https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
+        is_english: Callable[[str], bool] = self._is_english_func
+        assert is_english != "TODO", (
+            "you need to implement is_english. we use probability >= 0.7 with https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
+        )
 
         total_text = 0
         skipped_text = 0
