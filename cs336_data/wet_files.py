@@ -23,20 +23,23 @@ BASE_URL = "https://data.commoncrawl.org/"
 class _EnglishWetFile(Furu[Path]):
     chunk_urls: tuple[str, ...]
 
-    def _is_english_func(self, text: str) -> bool:
-        labels, probs = self.model.predict(text, k=1)
-        if labels[0] == "__label__en" and probs[0] >= 0.7:
-            return True
-        return False
+    
 
     def _create(self) -> Path:
-        self.model = fasttext.load_model("lid.176.bin")
-        print(self.model)
-        assert self.model is not None, "cannot load lid.176"
+        pred_model = fasttext.load_model(f"{get_shared_assets_path()}/classifiers/lid.176.bin")
+        assert pred_model is not None, "cannot load lid.176"
         output_path = self.data_dir / "data.warc.wet.gz"
 
+        def _is_english_func(text: str) -> bool:
+            text = text.replace('\n', ' ')
+            labels, probs = pred_model.predict(text, k=1)
+            if labels[0] == "__label__en" and probs[0] >= 0.7:
+                return True
+            return False
+
         self.logger.info("Loading English language identifier")
-        is_english: Callable[[str], bool] = self._is_english_func
+        is_english: Callable[[str], bool] = _is_english_func
+        
         assert is_english != "TODO", (
             "you need to implement is_english. we use probability >= 0.7 with https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.bin"
         )
@@ -96,7 +99,7 @@ def make_wet_file_on_modal(wet_file: _EnglishWetFile) -> Path:
 
 
 class EnglishWetFiles(Furu[list[Path]]):
-    n_files: int = 2500
+    n_files: int = 4
     group_size: int = 4
     shuffle_seed: int = 336
     crawl_id: str = "CC-MAIN-2026-17"

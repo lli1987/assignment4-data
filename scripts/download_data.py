@@ -88,6 +88,7 @@ def main(offline_only: bool = False):
     shards = sorted(
         set(re.findall(rf"enwiki-{dump_date}-pages-articles-multistream[0-9]+\.xml-p[0-9]+p[0-9]+\.bz2", html))
     )
+    shards = [shards[0]]
     wiki_out = root_path / "wiki/enwiki-20260501-extracted_urls.txt.gz"
     if not wiki_out.exists():
         wiki_out.parent.mkdir(parents=True, exist_ok=True)
