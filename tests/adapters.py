@@ -17,31 +17,36 @@ def run_identify_language(text: str) -> tuple[Any, float]:
 
 
 def run_mask_emails(text: str) -> tuple[str, int]:
-    raise NotImplementedError
+    from cs336_data import data_pipelines
+    return data_pipelines.mask_email(text)
 
 
 def run_mask_phone_numbers(text: str) -> tuple[str, int]:
-    raise NotImplementedError
+    from cs336_data import data_pipelines
+    return data_pipelines.mask_phone(text)
 
 
 def run_mask_ips(text: str) -> tuple[str, int]:
-    raise NotImplementedError
+    from cs336_data import data_pipelines
+    return data_pipelines.mask_ip(text)
 
 
 def run_classify_nsfw(text: str) -> tuple[Any, float]:
-    raise NotImplementedError
-
+    from cs336_data import data_pipelines
+    return data_pipelines.detect_nsfw(text)
 
 def run_classify_toxic_speech(text: str) -> tuple[Any, float]:
-    raise NotImplementedError
+    from cs336_data import data_pipelines
+    return data_pipelines.detect_toxic_speech(text)
 
 
 def run_classify_quality(text: str) -> tuple[Any, float]:
-    raise NotImplementedError
+    pass
 
 
 def run_gopher_quality_filter(text: str) -> bool:
-    raise NotImplementedError
+    from cs336_data import data_pipelines
+    return data_pipelines.check_quality(text)
 
 
 def run_exact_line_deduplication(input_files: list[os.PathLike], output_directory: os.PathLike):
